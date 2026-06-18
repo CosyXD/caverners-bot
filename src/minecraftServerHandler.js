@@ -7,14 +7,24 @@ let CavernersSMP = process.env.SERVER_IP;
 
 async function getStatus(ip) {
   console.log("Getting mc server status...");
+  if (!ip) {
+    console.error("SERVER_IP is not set.");
+    return 0;
+  }
+
   const req = await fetch(`https://api.mcstatus.io/v2/status/java/${ip}`, {
     headers: { "Content-Type": "application/json" },
   });
 
-  const response = await req.json();
-  let playerListData = response.players.list;
+  if (!req.ok) {
+    console.error(`Minecraft status request failed with ${req.status}.`);
+    return 0;
+  }
 
-  if (playerListData == null) {
+  const response = await req.json();
+  const playerListData = response?.players?.list;
+
+  if (!Array.isArray(playerListData)) {
     console.log("No one is on :(");
     return 0;
   } else {
@@ -24,7 +34,7 @@ async function getStatus(ip) {
 }
 
 function startMinecraftServerStatusPolling() {
-  client.once("ready", async () => {
+  client.once("clientReady", async () => {
     console.log("Bot is online!");
     const channel = await client.channels.fetch(process.env.CHANNEL_ID);
     let lastCounted = await getStatus(CavernersSMP);

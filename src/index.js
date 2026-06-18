@@ -7,6 +7,8 @@ const {
 const dotenv = require("dotenv");
 dotenv.config();
 
+const botToken = process.env.TOKEN ?? process.env.token;
+
 startMinecraftServerStatusPolling();
 
 client.on("interactionCreate", async (interaction) => {
@@ -39,4 +41,4 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-client.login(process.env.token);
+client.login(botToken);
